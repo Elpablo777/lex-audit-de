@@ -103,6 +103,17 @@ def create_app(
             runtime_holder["rt"] = create_runtime(cfg, in_memory=in_memory)
         return runtime_holder["rt"]
 
+    @app.get("/")
+    def get_api_root() -> dict[str, str]:
+        return {
+            "service": "LexAudit DE/EU API",
+            "status": "ok",
+            "hinweis": "Dies ist das FastAPI-Backend. Die Web-Oberfläche läuft auf http://127.0.0.1:3000.",
+            "portal_url": "http://127.0.0.1:3000",
+            "docs_url": "/docs",
+            "health_url": "/api/v1/health",
+        }
+
     @app.get("/api/v1/health")
     def get_health() -> dict[str, Any]:
         rt = _rt()

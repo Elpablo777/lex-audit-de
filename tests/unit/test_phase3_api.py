@@ -13,6 +13,11 @@ def _client() -> TestClient:
 
 def test_health_findings_and_graph_time_travel() -> None:
     with _client() as client:
+        root = client.get("/")
+        assert root.status_code == 200
+        assert root.json()["portal_url"] == "http://127.0.0.1:3000"
+        assert root.json()["docs_url"] == "/docs"
+
         health = client.get("/api/v1/health")
         assert health.status_code == 200
         h_data = health.json()
