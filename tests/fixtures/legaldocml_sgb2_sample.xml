@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<akomaNtoso xmlns="http://Inhaltsdaten.LegalDocML.de/1.7/">
+  <act name="sgb2-sozialgesetzbuch">
+    <meta>
+      <identification source="#bmj">
+        <FRBRWork>
+          <FRBRuri value="eli/bund/bgbl-1/2003/s2954"/>
+          <FRBRdate date="2003-12-24" name="ausfertigung"/>
+          <FRBRname value="Sozialgesetzbuch Zweites Buch (SGB II)"/>
+        </FRBRWork>
+        <FRBRExpression>
+          <FRBRuri value="eli/bund/bgbl-1/2003/s2954/2026-01-01/1/deu"/>
+          <FRBRdate date="2026-01-01" name="inkrafttreten"/>
+        </FRBRExpression>
+      </identification>
+    </meta>
+    <body>
+      <article eId="art-11b">
+        <num>§ 11b</num>
+        <heading>Absetzbeträge beim Bürgergeld</heading>
+        <paragraph eId="art-11b__para-1">
+          <num>(1)</num>
+          <content>
+            <p>Vom Einkommen sind abzusetzen die auf das Einkommen entrichteten Steuern, Pflichtbeiträge zur Sozialversicherung sowie der Grundfreibetrag nach Absatz 2 und die Erwerbstätigenfreibeträge nach Absatz 3 in Verbindung mit § 11 SGB II.</p>
+          </content>
+        </paragraph>
+        <paragraph eId="art-11b__para-3">
+          <num>(3)</num>
+          <content>
+            <p>Bei erwerbsfähigen Leistungsberechtigten, die erwerbstätig sind, ist ein Betrag von 20 Prozent des monatlichen Einkommens zwischen 100 Euro und 520 Euro sowie von 30 Prozent zwischen 520 Euro und 1.000 Euro abzusetzen; im Zusammenwirken mit § 19 WoGG und § 6a BKGG können effektive Transferentzugsraten über 80 Prozent entstehen.</p>
+          </content>
+        </paragraph>
+      </article>
+    </body>
+  </act>
+</akomaNtoso>

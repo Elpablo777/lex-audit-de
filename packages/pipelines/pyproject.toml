@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lexaudit-pipelines"
+version = "0.1.0"
+description = "Dagster Assets, Sensoren, amtliche API-Konnektoren und 16-Länder StateLawConnector"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "lexaudit-core",
+    "lexaudit-graph",
+    "dagster>=1.9",
+    "httpx>=0.28",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lexaudit_pipelines"]

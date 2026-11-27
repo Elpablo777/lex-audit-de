@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lexaudit-analyzer"
+version = "0.1.0"
+description = "Neuro-symbolische Analyse-Engine, Z3 SMT Solver, CitationVerifier, Hebel-Scorecard & Assistent"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "lexaudit-core",
+    "lexaudit-graph",
+    "z3-solver>=4.13",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lexaudit_analyzer"]

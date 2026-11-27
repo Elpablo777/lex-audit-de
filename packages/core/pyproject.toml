@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lexaudit-core"
+version = "0.1.0"
+description = "Schemas, Guardrails, Dual-LLM-Client, XML/QuantLaw-Parser und Hybrid-Storage für LexAudit DE/EU"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "httpx>=0.28",
+    "truststore>=0.10",
+    "lxml>=5.3",
+    "psycopg[binary]>=3.2",
+    "pgvector>=0.3",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lexaudit_core"]

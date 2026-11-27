@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dokumente builddate="20261124" doknr="BJNR014800974">
+  <norm doknr="BJNR014800974BJNE001815126">
+    <metadaten>
+      <jurabk>ErbStG</jurabk>
+      <amtabk>ErbStG</amtabk>
+      <ausfertigung-datum>1974-04-17</ausfertigung-datum>
+      <fundstelle typ="amtlich">
+        <periodikum>BGBl I</periodikum>
+        <zitstelle>1974, 933</zitstelle>
+      </fundstelle>
+      <enbez>§ 13a</enbez>
+      <titel>Steuerbefreiung für Betriebsvermögen, Betriebe der Land- und Forstwirtschaft und Anteile an Kapitalgesellschaften</titel>
+    </metadaten>
+    <textdaten>
+      <text format="XML">
+        <Content>
+          <P>(1) Begünstigtes Vermögen im Sinne des § 13b Absatz 2 bleibt vorbehaltlich des Satzes 2 zu 85 Prozent steuerfrei (Verschonungsabschlag), wenn der Wert des begünstigten Vermögens insgesamt 26 Millionen Euro nicht übersteigt. Überschreitet der Wert des begünstigten Vermögens die Grenze von 26 Millionen Euro, verringert sich der Verschonungsabschlag nach Maßgabe des § 13c.</P>
+          <P>(10) Der Erwerber kann unwiderruflich erklären, dass die Steuerbefreiung nach den Absätzen 1 bis 9b in Verbindung mit § 13b mit der Maßgabe gewährt wird, dass der Verschonungsabschlag 100 Prozent beträgt (Optionsverschonung), soweit das begünstigte Vermögen die Voraussetzungen nach § 28a erfüllt.</P>
+        </Content>
+      </text>
+    </textdaten>
+  </norm>
+  <norm doknr="BJNR014800974BJNE003200126">
+    <metadaten>
+      <jurabk>ErbStG</jurabk>
+      <amtabk>ErbStG</amtabk>
+      <enbez>§ 13c</enbez>
+      <titel>Verschonungsabschlag bei Großerwerben von begünstigtem Vermögen</titel>
+    </metadaten>
+    <textdaten>
+      <text format="XML">
+        <Content>
+          <P>(1) Überschreitet der Erwerb von begünstigtem Vermögen im Sinne des § 13b Absatz 2 die Grenze von 26 Millionen Euro nach § 13a Absatz 1 Satz 1, verringert sich der Verschonungsabschlag um jeweils einen Prozentpunkt für jede vollen 750 000 Euro, die der Wert des begünstigten Vermögens den Betrag von 26 Millionen Euro übersteigt.</P>
+        </Content>
+      </text>
+    </textdaten>
+  </norm>
+</dokumente>

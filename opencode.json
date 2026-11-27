@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openrouter/deepseek/deepseek-v4-pro",
+  "share": "disabled",
+  "provider": {
+    "openrouter": {
+      "options": {
+        "apiKey": "{env:OPENROUTER_API_KEY}"
+      }
+    }
+  },
+  "agent": {
+    "plan": {
+      "model": "openrouter/anthropic/claude-sonnet-5.5"
+    },
+    "build": {
+      "model": "openrouter/deepseek/deepseek-v4-pro"
+    },
+    "explore": {
+      "model": "openrouter/deepseek/deepseek-v4-flash"
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    "STATUS.md",
+    "docs/architecture/*.md"
+  ],
+  "mcp": {
+    "de-eli-mcp": {
+      "type": "local",
+      "command": ["uvx", "de-eli-mcp"],
+      "enabled": true
+    },
+    "eu-sparql-mcp": {
+      "type": "local",
+      "command": ["npx", "-y", "@matematicsolutions/mcp-eu-sparql"],
+      "enabled": true
+    }
+  }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ACT>
+  <BIB.INSTANCE>
+    <DOCUMENT.REF FILE="CELEX:31991L0676">
+      <ELI>http://data.europa.eu/eli/dir/1991/676/oj</ELI>
+      <CELEX>31991L0676</CELEX>
+      <DATE.DOCUMENT>1991-12-12</DATE.DOCUMENT>
+      <DATE.TRANSPOSITION>1993-12-20</DATE.TRANSPOSITION>
+    </DOCUMENT.REF>
+    <TITLE>
+      <TI><P>Richtlinie 91/676/EWG des Rates vom 12. Dezember 1991 zum Schutz der Gewässer vor Verunreinigung durch Nitrat aus landwirtschaftlichen Quellen (Nitratrichtlinie)</P></TI>
+    </TITLE>
+  </BIB.INSTANCE>
+  <BODY>
+    <ARTICLE IDENTIFIER="005">
+      <TI.ART>Artikel 5</TI.ART>
+      <ALINEA>Die Mitgliedstaaten legen für die als gefährdet ausgewiesenen Gebiete Aktionsprogramme fest, um die Verunreinigung durch Nitrat aus landwirtschaftlichen Quellen wirksam zu verringern und weitere Gewässerverunreinigungen zu verhindern.</ALINEA>
+    </ARTICLE>
+  </BODY>
+</ACT>

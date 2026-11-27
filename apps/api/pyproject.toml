@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lexaudit-api"
+version = "0.1.0"
+description = "FastAPI REST- und SSE-Backend für LexAudit DE/EU"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "lexaudit-core",
+    "lexaudit-graph",
+    "lexaudit-pipelines",
+    "lexaudit-analyzer",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lexaudit_api"]

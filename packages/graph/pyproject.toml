@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lexaudit-graph"
+version = "0.1.0"
+description = "Bitemporales GraphRepository (Neo4j, Apache AGE, NetworkX) für LexAudit DE/EU"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "lexaudit-core",
+    "networkx>=3.4",
+    "neo4j>=5.26",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lexaudit_graph"]

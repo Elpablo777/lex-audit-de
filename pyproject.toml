@@ -1,0 +1,64 @@
+[project]
+name = "lex-audit-de"
+version = "0.1.0"
+description = "LexAudit DE/EU — Gemeinnütziges föderales Rechts-Audit- & Demokratie-Portal"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "MIT" }
+dependencies = [
+    "lexaudit-core",
+    "lexaudit-graph",
+    "lexaudit-pipelines",
+    "lexaudit-analyzer",
+    "lexaudit-api",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+    "mypy>=1.13",
+]
+
+[tool.uv.workspace]
+members = ["packages/*", "apps/api"]
+
+[tool.uv.sources]
+lexaudit-core = { workspace = true }
+lexaudit-graph = { workspace = true }
+lexaudit-pipelines = { workspace = true }
+lexaudit-analyzer = { workspace = true }
+lexaudit-api = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+mypy_path = [
+    "packages/core/src",
+    "packages/graph/src",
+    "packages/pipelines/src",
+    "packages/analyzer/src",
+    "apps/api/src",
+]
+
+[[tool.mypy.overrides]]
+module = ["z3.*", "dagster.*", "neo4j.*", "pgvector.*", "truststore.*", "lxml.*", "networkx.*"]
+ignore_missing_imports = true
