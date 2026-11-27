@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, ArrowRight, CheckCircle2, Globe, ShieldCheck } from "lucide-react";
-import { CONFLICT_CLASS_LABELS, LEVER_LABELS, apiUrl, fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { CONFLICT_CLASS_LABELS, LEVER_LABELS, apiUrl, fetchJson, formatApiError } from "@/lib/api";
 import type { ConflictFinding, HealthResponse, StatePortalDescriptor } from "@/lib/types";
 
 interface AuditStreamLog {
@@ -22,7 +23,8 @@ export default function HomePage() {
   const [liveProbe, setLiveProbe] = useState<Record<string, { ok: boolean; sample?: string; count?: number; error?: string }> | null>(null);
   const [probing, setProbing] = useState(false);
 
-  useEffect(() => {
+  const loadInitialData = () => {
+    setError(null);
     Promise.all([
       fetchJson<HealthResponse>("/api/v1/health"),
       fetchJson<ConflictFinding[]>("/api/v1/findings"),
@@ -34,8 +36,12 @@ export default function HomePage() {
         setStates(s);
       })
       .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "Backend nicht erreichbar");
+        setError(formatApiError(err));
       });
+  };
+
+  useEffect(() => {
+    loadInitialData();
   }, []);
 
   function runLiveAuditStream() {
@@ -118,8 +124,8 @@ export default function HomePage() {
         </div>
 
         {error && (
-          <div role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-editorial-danger">
-            API-Hinweis: {error}
+          <div className="mt-4">
+            <ApiConnectionAlert error={error} onRetry={loadInitialData} />
           </div>
         )}
 

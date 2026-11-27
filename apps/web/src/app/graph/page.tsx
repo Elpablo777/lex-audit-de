@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { fetchJson, formatApiError } from "@/lib/api";
 import type { GraphSnapshot } from "@/lib/types";
 
 const LegalWebGLGraph = dynamic(
@@ -16,15 +17,19 @@ export default function GraphPage() {
   const [domain, setDomain] = useState("all");
   const [snapshot, setSnapshot] = useState<GraphSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadGraph = useCallback(async (dateVal: string, lvlVal: string, domVal: string) => {
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams({ as_of: dateVal });
       if (lvlVal !== "all") params.set("jurisdiction_level", lvlVal);
       if (domVal !== "all") params.set("legal_domain", domVal);
       const snap = await fetchJson<GraphSnapshot>(`/api/v1/graph?${params.toString()}`);
       setSnapshot(snap);
+    } catch (err: unknown) {
+      setError(formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -115,6 +120,11 @@ export default function GraphPage() {
           </select>
         </div>
       </div>
+
+      <ApiConnectionAlert
+        error={error}
+        onRetry={() => loadGraph(asOf, level, domain)}
+      />
 
       {loading && !snapshot ? (
         <div className="rounded-xl border border-editorial-border bg-white p-8 text-center text-sm text-editorial-muted">

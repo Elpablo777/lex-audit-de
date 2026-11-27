@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
+import GraphPage from "@/app/graph/page";
 import SimulatorPage from "@/app/simulator/page";
 import { ConflictCausalFlow } from "@/components/ConflictCausalFlow";
 import { LegalWebGLGraph } from "@/components/LegalWebGLGraph";
@@ -163,5 +164,18 @@ describe("WCAG 2.2 Barrierefreiheit & Portal-Komponenten", () => {
     expect(screen.getByText("Grenzbelastung %")).toBeInTheDocument();
     expect(screen.getByText("107.7 %")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalled();
+  });
+
+  it("zeigt auf der Graph-Seite einen klaren deutschen Verbindungshinweis statt stillem Absturz", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Failed to fetch"));
+
+    render(<GraphPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Backend-Verbindung fehlgeschlagen/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/uvicorn lexaudit_api\.main:app/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("button", { name: /Erneut verbinden/i })).toBeInTheDocument();
   });
 });

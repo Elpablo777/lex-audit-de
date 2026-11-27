@@ -1,25 +1,64 @@
+export class ApiConnectionError extends Error {
+  readonly isNetworkError = true;
+  readonly targetUrl: string;
+
+  constructor(targetUrl: string, causeMessage?: string) {
+    super(
+      `FastAPI-Backend unter ${targetUrl} ist nicht erreichbar${
+        causeMessage ? ` (${causeMessage})` : ""
+      }. Bitte mit "pnpm.cmd --dir apps/web start" (inkl. Auto-API) oder im zweiten Terminal mit "uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8010" starten.`
+    );
+    this.name = "ApiConnectionError";
+    this.targetUrl = targetUrl;
+  }
+}
+
 export function apiUrl(path: string): string {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8010";
   if (typeof window !== "undefined") {
-    // Direkter Zugriff auf FastAPI (CORS konfiguriert) verhindert Next.js-Rewrite-ECONNRESET bei Keep-Alive-Timeouts
     const host = window.location.hostname;
-    if (host === "127.0.0.1" || host === "localhost") {
-      return `http://${host}:8010${path}`;
+    // Immer IPv4 127.0.0.1 verwenden, weil localhost unter Windows teils auf IPv6 ::1 auflöst
+    if (host === "127.0.0.1" || host === "localhost" || host === "[::1]" || host === "::1") {
+      return `http://127.0.0.1:8010${path}`;
     }
     return path;
   }
   return `${base}${path}`;
 }
 
+export function formatApiError(err: unknown): string {
+  if (err instanceof ApiConnectionError) {
+    return err.message;
+  }
+  if (err instanceof TypeError) {
+    return new ApiConnectionError(apiUrl(""), err.message).message;
+  }
+  if (err instanceof Error) {
+    if (err.message.toLowerCase().includes("failed to fetch")) {
+      return new ApiConnectionError(apiUrl(""), err.message).message;
+    }
+    return err.message;
+  }
+  return "Unbekannter API-Fehler.";
+}
+
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(apiUrl(path), {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-    cache: "no-store",
-  });
+  const url = apiUrl(path);
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+      },
+      cache: "no-store",
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : undefined;
+    throw new ApiConnectionError(url, msg);
+  }
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`HTTP ${res.status}: ${text}`);

@@ -3,18 +3,26 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { CONFLICT_CLASS_LABELS, LEVER_LABELS, fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { CONFLICT_CLASS_LABELS, LEVER_LABELS, fetchJson, formatApiError } from "@/lib/api";
 import type { ConflictFinding } from "@/lib/types";
 
 export default function FindingsListPage() {
   const [findings, setFindings] = useState<ConflictFinding[]>([]);
   const [domainFilter, setDomainFilter] = useState("all");
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadFindings = () => {
+    setError(null);
     const q = domainFilter === "all" ? "" : `?legal_domain=${encodeURIComponent(domainFilter)}`;
     fetchJson<ConflictFinding[]>(`/api/v1/findings${q}`)
       .then(setFindings)
-      .catch(() => {});
+      .catch((err: unknown) => setError(formatApiError(err)));
+  };
+
+  useEffect(() => {
+    loadFindings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [domainFilter]);
 
   return (
@@ -47,6 +55,8 @@ export default function FindingsListPage() {
           </select>
         </div>
       </div>
+
+      <ApiConnectionAlert error={error} onRetry={loadFindings} />
 
       <div className="space-y-4">
         {findings.map((f) => (

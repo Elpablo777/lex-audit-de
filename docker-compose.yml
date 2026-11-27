@@ -76,6 +76,7 @@ services:
       - .:/app
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8010
+      LEXAUDIT_WEB_ONLY: "1"
     depends_on:
       - api
     command: >

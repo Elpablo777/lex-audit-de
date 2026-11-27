@@ -4,7 +4,8 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { CheckCircle2, Clock, ExternalLink, Scale } from "lucide-react";
-import { CONFLICT_CLASS_LABELS, LEVER_LABELS, fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { CONFLICT_CLASS_LABELS, LEVER_LABELS, fetchJson, formatApiError } from "@/lib/api";
 import type { ConflictFinding } from "@/lib/types";
 
 const ConflictCausalFlow = dynamic(
@@ -40,18 +41,20 @@ export default function FindingDetailPage({
   const [data, setData] = useState<FindingDetailPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadFinding = () => {
+    setError(null);
     fetchJson<FindingDetailPayload>(`/api/v1/findings/${id}`)
       .then(setData)
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : "Fehler"));
+      .catch((err: unknown) => setError(formatApiError(err)));
+  };
+
+  useEffect(() => {
+    loadFinding();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (error) {
-    return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-editorial-danger">
-        Befund konnte nicht geladen werden: {error}
-      </div>
-    );
+    return <ApiConnectionAlert error={error} onRetry={loadFinding} />;
   }
   if (!data) {
     return <div className="p-8 text-sm text-editorial-muted">Lade Befunddetails...</div>;

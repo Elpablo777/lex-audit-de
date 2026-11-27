@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, FileText, Mail, Send } from "lucide-react";
-import { fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { fetchJson, formatApiError } from "@/lib/api";
 import type { ConflictFinding, PetitionDraft, StatePortalDescriptor } from "@/lib/types";
 
 interface RepresentativeResponse {
@@ -39,8 +40,12 @@ export default function ActionsPage() {
   const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchJson<ConflictFinding[]>("/api/v1/findings").then(setFindings).catch(() => {});
-    fetchJson<StatePortalDescriptor[]>("/api/v1/states").then(setStates).catch(() => {});
+    fetchJson<ConflictFinding[]>("/api/v1/findings")
+      .then(setFindings)
+      .catch((err: unknown) => setActionError(formatApiError(err)));
+    fetchJson<StatePortalDescriptor[]>("/api/v1/states")
+      .then(setStates)
+      .catch((err: unknown) => setActionError(formatApiError(err)));
   }, []);
 
   async function buildPetition(overrideText?: string) {
@@ -60,7 +65,7 @@ export default function ActionsPage() {
         setCustomText(res.request_text);
       }
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Petitions-Prüfung fehlgeschlagen");
+      setActionError(formatApiError(err));
     }
   }
 
@@ -76,7 +81,7 @@ export default function ActionsPage() {
       );
       setReps(res);
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Abgeordneten-Abfrage fehlgeschlagen");
+      setActionError(formatApiError(err));
     }
   }
 
@@ -87,7 +92,7 @@ export default function ActionsPage() {
       );
       setBriefingMd(res.markdown_dossier);
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Briefing konnte nicht geladen werden");
+      setActionError(formatApiError(err));
     }
   }
 
@@ -100,7 +105,7 @@ export default function ActionsPage() {
       );
       setDngText(res.dng_request_text);
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "DNG-Antrag fehlgeschlagen");
+      setActionError(formatApiError(err));
     }
   }
 
@@ -126,11 +131,13 @@ export default function ActionsPage() {
       </div>
 
       {/* Befund-Auswahl */}
-      {actionError && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-editorial-danger">
-          {actionError}
-        </div>
-      )}
+      <ApiConnectionAlert
+        error={actionError}
+        onRetry={() => {
+          buildPetition("");
+          loadBriefing();
+        }}
+      />
       <div className="rounded-xl border border-editorial-border bg-white p-4">
         <label htmlFor="action-finding-select" className="block text-xs font-semibold text-editorial-muted">
           Ausgangsbefund wählen

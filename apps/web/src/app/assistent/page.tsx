@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { CheckCircle2, Compass, ShieldAlert } from "lucide-react";
-import { fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { fetchJson, formatApiError } from "@/lib/api";
 import type { AssistantResponse } from "@/lib/types";
 
 export default function AssistantPage() {
@@ -32,7 +33,7 @@ export default function AssistantPage() {
       });
       setResponse(res);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Anfrage fehlgeschlagen");
+      setError(formatApiError(err));
       setResponse(null);
     } finally {
       setLoading(false);
@@ -134,11 +135,7 @@ export default function AssistantPage() {
         </div>
       </div>
 
-      {error && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-editorial-danger">
-          {error}
-        </div>
-      )}
+      <ApiConnectionAlert error={error} onRetry={() => submitQuery()} />
 
       {response && (
         <section className="rounded-2xl border border-editorial-border bg-white p-6 shadow-sm space-y-4">

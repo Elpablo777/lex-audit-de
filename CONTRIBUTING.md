@@ -18,14 +18,19 @@ Herzlich willkommen! **LexAudit DE/EU** ist ein gemeinnütziges Open-Source-Civi
    uv run ruff check .
    uv run mypy packages apps
    pnpm --dir apps/web lint
+   pnpm --dir apps/web typecheck
    pnpm --dir apps/web test
    pnpm --dir apps/web build
+   pnpm --dir apps/web audit
    ```
-4. **Mit Docker-Infrastruktur testen:**
+4. **Mit Docker-Infrastruktur lokal starten:**
    ```powershell
    docker compose up -d postgres neo4j
+   # Startet FastAPI (:8010) automatisch mit, falls noch kein Backend läuft:
+   pnpm --dir apps/web start
+   # Oder getrennt in zwei Terminals:
    uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8010
-   pnpm --dir apps/web dev
+   pnpm --dir apps/web dev:web
    ```
 
 ## Verbindliche Regeln vor jedem Pull Request

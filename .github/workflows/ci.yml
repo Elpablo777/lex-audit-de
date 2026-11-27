@@ -43,5 +43,6 @@ jobs:
       - name: Lint, Tests & Production-Build
         run: |
           pnpm --dir apps/web lint
+          pnpm --dir apps/web typecheck
           pnpm --dir apps/web test
           pnpm --dir apps/web build

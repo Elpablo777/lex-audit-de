@@ -31,10 +31,12 @@ uv run mypy packages apps
 # 4. Optionale Infrastruktur (PostgreSQL 17 + pgvector & Neo4j) starten
 docker compose up -d postgres neo4j
 
-# 5. API & WebGL-Bürgerportal starten
-uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8010
+# 5. API & WebGL-Bürgerportal starten (ein Befehl — API auf Port 8010 startet automatisch mit!)
 pnpm --dir apps/web install
-pnpm --dir apps/web dev
+pnpm --dir apps/web build
+pnpm --dir apps/web start
+# Alternative (PowerShell / Python direkt): .\scripts\start_local.ps1 oder uv run python scripts/start_local.py
+# Nur Frontend ohne Auto-API (falls :8010 separat läuft): $env:LEXAUDIT_WEB_ONLY="1"; pnpm --dir apps/web start:web
 ```
 
 ## Dokumentation für Mitwirkende & KI-Agenten

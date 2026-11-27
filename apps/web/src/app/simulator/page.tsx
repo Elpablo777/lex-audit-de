@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Calculator } from "lucide-react";
-import { fetchJson } from "@/lib/api";
+import { ApiConnectionAlert } from "@/components/ApiConnectionAlert";
+import { fetchJson, formatApiError } from "@/lib/api";
 import type { HouseholdPoint, Z3Counterexample } from "@/lib/types";
 
 interface HouseholdSimResponse {
@@ -32,22 +33,37 @@ export default function SimulatorPage() {
   const [assetsMio, setAssetsMio] = useState(120);
   const [privateMio, setPrivateMio] = useState(2);
   const [erbData, setErbData] = useState<ErbstgSimResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadHousehold = useCallback(() => {
     fetchJson<HouseholdSimResponse>(
       `/api/v1/z3/household?rent=${rent}&children=${children}&threshold_pct=100`
     )
-      .then(setHhData)
-      .catch(() => {});
+      .then((res) => {
+        setHhData(res);
+        setError(null);
+      })
+      .catch((err: unknown) => setError(formatApiError(err)));
   }, [rent, children]);
 
-  useEffect(() => {
+  const loadErbstg = useCallback(() => {
     fetchJson<ErbstgSimResponse>(
       `/api/v1/z3/erbstg?business_assets_mio=${assetsMio}&private_assets_mio=${privateMio}`
     )
-      .then(setErbData)
-      .catch(() => {});
+      .then((res) => {
+        setErbData(res);
+        setError(null);
+      })
+      .catch((err: unknown) => setError(formatApiError(err)));
   }, [assetsMio, privateMio]);
+
+  useEffect(() => {
+    loadHousehold();
+  }, [loadHousehold]);
+
+  useEffect(() => {
+    loadErbstg();
+  }, [loadErbstg]);
 
   return (
     <div className="space-y-10">
@@ -60,6 +76,14 @@ export default function SimulatorPage() {
           Schnittstellenbrüche und regressive Belastungssprünge.
         </p>
       </div>
+
+      <ApiConnectionAlert
+        error={error}
+        onRetry={() => {
+          loadHousehold();
+          loadErbstg();
+        }}
+      />
 
       {/* Pilot 1: SGB II / WoGG / Kinderzuschlag / EStG */}
       <section className="rounded-2xl border border-editorial-border bg-white p-6 shadow-sm space-y-5">
