@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import IntEnum, StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
@@ -247,7 +247,7 @@ class ConflictFinding(BaseModel):
     z3_counterexample: Z3Counterexample | None = None
     ai_transparency_notice: str = AI_TRANSPARENCY_NOTICE_DE
     generated_by_tier: str = "deterministic-hybrid"
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     @model_validator(mode="after")
     def _enforce_verification_invariant(self) -> ConflictFinding:

@@ -131,12 +131,12 @@ class RDGComplianceGuard:
     _INDIVIDUAL_CASE_PATTERNS: tuple[re.Pattern[str], ...] = (
         re.compile(
             r"(?i)\b(habe\s+ich|steht\s+mir|kann\s+ich|muss\s+ich|darf\s+ich)\b"
-            r".{0,40}\b(anspruch|recht|klagen|widerspruch|einspruch|erfolg|chancen|geld|wohngeld|bürgergeld)\b"
+            r".{0,90}\b(anspruch|recht|klagen|widerspruch|einspruch|erfolg|chancen|geld|wohngeld|bürgergeld)\b"
         ),
         re.compile(
-            r"(?i)\b(in\s+meinem\s+(konkreten\s+)?fall|mein\s+(bescheid|vertrag|vermieter|arbeitgeber|finanzamt|jobcenter|erbe)|meine\s+(kündigung|klage|steuererklärung|frist))\b"
+            r"(?i)\b(in\s+meinem\s+(?:konkreten\s+)?fall|mein(?:en|em|er|es)?\s+(?:steuer)?(?:bescheid|vertrag|vermieter|arbeitgeber|finanzamt|jobcenter|erbe)|meine[rn]?\s+(?:kündigung|klage|steuererklärung|frist))\b"
         ),
-        re.compile(r"(?i)\b(wie\s+soll\s+ich\s+(jetzt\s+)?vorgehen|prüfe\s+meinen\s+fall|berate\s+mich)\b"),
+        re.compile(r"(?i)\b(wie\s+soll\s+ich\s+(?:jetzt\s+)?vorgehen|prüfe\s+meinen\s+fall|berate\s+mich)\b"),
     )
 
     REFERRAL_NOTICE = (
