@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import functools
 import json
 import sqlite3
+import threading
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -21,6 +24,19 @@ from lexaudit_core.schemas import (
     ParliamentaryDoc,
     TemporalStatus,
 )
+
+
+def _synchronized[**P, R](fn: Callable[P, R]) -> Callable[P, R]:
+    """Serialisiert SQLite-Zugriffe sauber über den Instanz-RLock für Multi-Thread-APIs."""
+
+    @functools.wraps(fn)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        self_obj: Any = args[0]
+        lock: threading.RLock = self_obj._lock
+        with lock:
+            return fn(*args, **kwargs)
+
+    return wrapper
 
 
 @dataclass(frozen=True)
@@ -53,6 +69,7 @@ class StorageBackend(Protocol):
     def lookup_full_text(
         self, ref_id: str, as_of: date | None = None
     ) -> tuple[str, str, str, str] | None: ...
+    @_synchronized
     def hybrid_search(self, query: str, *, limit: int = 10) -> list[SearchHit]: ...
     def save_finding(self, finding: ConflictFinding) -> None: ...
     def get_finding(self, finding_id: str) -> ConflictFinding | None: ...
@@ -68,6 +85,7 @@ class SQLiteStorageBackend:
         self.db_path = str(db_path)
         self.settings = settings or get_settings()
         self.embedder = EmbeddingAdapter(self.settings)
+        self._lock = threading.RLock()
         if self.db_path != ":memory:":
             Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
@@ -136,6 +154,7 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def upsert_act(self, act: LegalAct) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO legal_acts (act_id, payload) VALUES (?, ?)",
@@ -143,6 +162,7 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def upsert_norm(self, norm: NormUnit) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO norm_units (norm_id, act_id, payload) VALUES (?, ?, ?)",
@@ -150,6 +170,7 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def upsert_temporal_version(self, version: ComponentTemporalVersion) -> bool:
         """Legt neue bitemporale Fassung an, ohne alte Fassungen zu überschreiben.
 
@@ -201,6 +222,7 @@ class SQLiteStorageBackend:
         self._conn.commit()
         return True
 
+    @_synchronized
     def upsert_court_decision(self, decision: CourtDecision) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO court_decisions (decision_id, ecli, decision_date, payload) "
@@ -214,6 +236,7 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def upsert_parliamentary_doc(self, doc: ParliamentaryDoc) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO parliamentary_docs (doc_id, publication_date, payload) "
@@ -222,6 +245,7 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def upsert_chunks(self, chunks: list[DomainChunk], source_url: str = "") -> None:
         for ch in chunks:
             self._conn.execute(
@@ -245,34 +269,41 @@ class SQLiteStorageBackend:
             )
         self._conn.commit()
 
+    @_synchronized
     def get_act(self, act_id: str) -> LegalAct | None:
         row = self._conn.execute("SELECT payload FROM legal_acts WHERE act_id = ?", (act_id,)).fetchone()
         return LegalAct.model_validate_json(row["payload"]) if row else None
 
+    @_synchronized
     def get_norm(self, norm_id: str) -> NormUnit | None:
         row = self._conn.execute("SELECT payload FROM norm_units WHERE norm_id = ?", (norm_id,)).fetchone()
         return NormUnit.model_validate_json(row["payload"]) if row else None
 
+    @_synchronized
     def list_norms(self, limit: int = 500) -> list[NormUnit]:
         rows = self._conn.execute("SELECT payload FROM norm_units LIMIT ?", (limit,)).fetchall()
         return [NormUnit.model_validate_json(r["payload"]) for r in rows]
 
+    @_synchronized
     def list_acts(self) -> list[LegalAct]:
         rows = self._conn.execute("SELECT payload FROM legal_acts").fetchall()
         return [LegalAct.model_validate_json(r["payload"]) for r in rows]
 
+    @_synchronized
     def list_court_decisions(self) -> list[CourtDecision]:
         rows = self._conn.execute(
             "SELECT payload FROM court_decisions ORDER BY decision_date DESC"
         ).fetchall()
         return [CourtDecision.model_validate_json(r["payload"]) for r in rows]
 
+    @_synchronized
     def list_parliamentary_docs(self) -> list[ParliamentaryDoc]:
         rows = self._conn.execute(
             "SELECT payload FROM parliamentary_docs ORDER BY publication_date DESC"
         ).fetchall()
         return [ParliamentaryDoc.model_validate_json(r["payload"]) for r in rows]
 
+    @_synchronized
     def get_version_at_date(
         self, norm_id: str, as_of: date | None = None
     ) -> ComponentTemporalVersion | None:
@@ -291,6 +322,7 @@ class SQLiteStorageBackend:
         ).fetchone()
         return ComponentTemporalVersion.model_validate_json(fallback["payload"]) if fallback else None
 
+    @_synchronized
     def list_versions_for_norm(self, norm_id: str) -> list[ComponentTemporalVersion]:
         rows = self._conn.execute(
             "SELECT payload FROM temporal_versions WHERE norm_id = ? ORDER BY valid_from ASC",
@@ -298,6 +330,7 @@ class SQLiteStorageBackend:
         ).fetchall()
         return [ComponentTemporalVersion.model_validate_json(r["payload"]) for r in rows]
 
+    @_synchronized
     def lookup_full_text(
         self, ref_id: str, as_of: date | None = None
     ) -> tuple[str, str, str, str] | None:
@@ -331,6 +364,7 @@ class SQLiteStorageBackend:
             return f"{doc.title}\n{doc.summary}", doc.source_url, doc.doc_number, "in_force"
         return None
 
+    @_synchronized
     def hybrid_search(self, query: str, *, limit: int = 10) -> list[SearchHit]:
         """Kombiniert Vektor-Kosinusähnlichkeit mit SQLite-FTS5-Keywords."""
         q_vec = self.embedder.embed_query(query)
@@ -370,6 +404,7 @@ class SQLiteStorageBackend:
         scored.sort(key=lambda h: h.score, reverse=True)
         return scored[:limit]
 
+    @_synchronized
     def save_finding(self, finding: ConflictFinding) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO conflict_findings (finding_id, verification_status, payload) "
@@ -378,12 +413,14 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def get_finding(self, finding_id: str) -> ConflictFinding | None:
         row = self._conn.execute(
             "SELECT payload FROM conflict_findings WHERE finding_id = ?", (finding_id,)
         ).fetchone()
         return ConflictFinding.model_validate_json(row["payload"]) if row else None
 
+    @_synchronized
     def list_findings(self, include_rejected: bool = False) -> list[ConflictFinding]:
         if include_rejected:
             rows = self._conn.execute("SELECT payload FROM conflict_findings").fetchall()
@@ -393,6 +430,7 @@ class SQLiteStorageBackend:
             ).fetchall()
         return [ConflictFinding.model_validate_json(r["payload"]) for r in rows]
 
+    @_synchronized
     def save_audit_run(self, run: AuditRun) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO audit_runs (run_id, started_at, payload) VALUES (?, ?, ?)",
@@ -400,6 +438,7 @@ class SQLiteStorageBackend:
         )
         self._conn.commit()
 
+    @_synchronized
     def list_audit_runs(self, limit: int = 20) -> list[AuditRun]:
         rows = self._conn.execute(
             "SELECT payload FROM audit_runs ORDER BY started_at DESC LIMIT ?", (limit,)

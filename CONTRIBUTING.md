@@ -24,7 +24,7 @@ Herzlich willkommen! **LexAudit DE/EU** ist ein gemeinnütziges Open-Source-Civi
 4. **Mit Docker-Infrastruktur testen:**
    ```powershell
    docker compose up -d postgres neo4j
-   uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8000
+   uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8010
    pnpm --dir apps/web dev
    ```
 

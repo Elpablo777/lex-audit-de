@@ -32,7 +32,7 @@ uv run mypy packages apps
 docker compose up -d postgres neo4j
 
 # 5. API & WebGL-Bürgerportal starten
-uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8000
+uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8010
 pnpm --dir apps/web install
 pnpm --dir apps/web dev
 ```

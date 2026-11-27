@@ -12,7 +12,7 @@ Gemeinnützige Open-Source-Rechtsplattform für Deutschland und die EU (Pilot-Bu
 - **Eval-Suite (RAGAS-/Citation-Gate):** `uv run pytest tests/eval/ --strict-citations`
 - **Frontend (WebGL/Next.js):** `pnpm --dir apps/web install; pnpm --dir apps/web lint; pnpm --dir apps/web test; pnpm --dir apps/web build`
 - **Infrastruktur lokal (PostgreSQL + pgvector + Neo4j):** `docker compose up -d postgres neo4j`
-- **FastAPI-Backend lokal:** `uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8000 --reload`
+- **FastAPI-Backend lokal:** `uv run uvicorn lexaudit_api.main:app --host 127.0.0.1 --port 8010 --reload`
 - **Dagster Dev-Server:** `uv run dagster dev -m lexaudit_pipelines.definitions`
 
 *(Hinweis für Windows PowerShell 5.1: Statt `&&` Befehle mit `;` oder `if ($LASTEXITCODE -eq 0)` verketten.)*

@@ -1,7 +1,5 @@
 """Dagster-Orchestrierung: Versionierte Legal-Data-Assets & tägliche Sensoren (0 KI-Tokens)."""
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Any
 

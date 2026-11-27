@@ -48,7 +48,7 @@ services:
     profiles: ["full"]
     working_dir: /app
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8010:8010"
     volumes:
       - .:/app
     environment:
@@ -63,7 +63,7 @@ services:
       neo4j:
         condition: service_healthy
     command: >
-      sh -c "pip install --no-cache-dir uv && uv sync --frozen --no-dev && uv run uvicorn lexaudit_api.main:app --host 0.0.0.0 --port 8000"
+      sh -c "pip install --no-cache-dir uv && uv sync --frozen --no-dev && uv run uvicorn lexaudit_api.main:app --host 0.0.0.0 --port 8010"
 
   web:
     image: node:22-alpine
@@ -75,7 +75,7 @@ services:
     volumes:
       - .:/app
     environment:
-      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8010
     depends_on:
       - api
     command: >

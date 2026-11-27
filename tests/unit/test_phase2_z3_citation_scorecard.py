@@ -41,7 +41,21 @@ def test_z3_proves_social_transfer_trap_over_100_percent() -> None:
     assert float(proof.outputs["marginal_withdrawal_rate_pct"]) > 100.0
 
     curve = simulate_household_curve(rent=850.0, children=2)
-    assert any(pt.marginal_withdrawal_rate_pct > 80.0 for pt in curve)
+    assert any(pt.marginal_withdrawal_rate_pct > 100.0 for pt in curve)
+    assert all(pt.marginal_withdrawal_rate_pct >= 0.0 for pt in curve)
+
+
+def test_z3_concurrent_thread_safety() -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _run_pair(i: int) -> tuple[bool, bool]:
+        p1 = analyze_transfer_withdrawal_z3(rent=800.0 + i * 10, children=2)
+        p2 = analyze_erbstg_cliff_z3(private_assets_mio=2.0)
+        return p1.satisfiable, p2.satisfiable
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(_run_pair, range(16)))
+    assert all(a and b for a, b in results)
 
 
 def test_z3_proves_erbstg_regressive_cliff() -> None:

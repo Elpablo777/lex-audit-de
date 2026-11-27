@@ -27,7 +27,11 @@ apps/web/test-results/
 # Datenbanken & lokale Daten-Dumps
 *.sqlite
 *.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
 *.db
+*.db-wal
+*.db-shm
 data/raw/
 data/cache/
 volltext/
